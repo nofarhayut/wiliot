@@ -1,4 +1,5 @@
-# Master password is generated, never hard-coded, and stored in Secrets Manager.
+# Master password is generated (never hard-coded) and exposed only as a
+# sensitive Terraform output kept in the encrypted S3 state.
 resource "random_password" "master" {
   length  = 24
   special = false # avoid symbols that break connection strings / URLs
