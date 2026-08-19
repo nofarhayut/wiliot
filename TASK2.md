@@ -29,14 +29,6 @@ The DAG itself does the ETL: **extract** (call the mock) → **transform** (clea
 | **DAG delivery** | ConfigMap | The DAG file is packed into a ConfigMap and mounted into Airflow (no git-sync, no PVC, no custom image). |
 | **RDS connection** | [`modules/rds`](modules/rds) | The DB connection string is injected into Airflow as a Kubernetes secret, so the DAG uses it by name (`rds_postgres`) and no password sits in the code. |
 
-## Deploy
-
-```bash
-export AWS_PROFILE=nofar-yaba AWS_REGION=us-east-1
-aws eks update-kubeconfig --name wiliot-dev --region us-east-1
-make deploy    # install Microcks -> load the mock -> pack the DAG -> mount into Airflow
-```
-
 ## How to look at things
 
 Standard `kubectl`, runnable from any machine with access to the cluster.
@@ -64,10 +56,4 @@ curl -s http://localhost:8585/rest/Orders/1.0.0/orders | jq '.[0]'
 kubectl -n airflow exec deploy/airflow-scheduler -c scheduler -- python -c \
 "from airflow.providers.postgres.hooks.postgres import PostgresHook; \
 print(PostgresHook('rds_postgres').get_first('SELECT count(*) FROM orders'))"
-```
-
-## Clean up
-
-```bash
-make clean    # removes ONLY Microcks + the DAG ConfigMap (leaves infra/EKS/RDS/Airflow)
 ```
