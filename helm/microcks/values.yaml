@@ -1,0 +1,35 @@
+# Minimal in-cluster Microcks for the demo.
+# Auth OFF, bundled Mongo (ephemeral), no ingress, ClusterIP service.
+# The mock is consumed inside the cluster by the Airflow DAG; we only
+# port-forward for the one-time artifact import and to view the UI.
+
+ingresses: false # no external ingress; not needed for an in-cluster mock
+
+microcks:
+  url: microcks.local # required field; only used to build ingress/console links (unused here)
+  serviceType: ClusterIP
+  replicas: 1
+  resources:
+    requests:
+      cpu: 100m
+      memory: 384Mi
+    limits:
+      memory: 512Mi
+
+# DEMO SHORTCUT: disable authentication entirely and skip deploying Keycloak.
+# Fine for a demo; a real deployment keeps Keycloak on.
+keycloak:
+  enabled: false
+  install: false
+
+# Bundled MongoDB with persistence OFF -> no PVC.
+# (This cluster has no EBS CSI driver, so any PVC would hang Pending.)
+mongodb:
+  install: true
+  persistent: false
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      memory: 512Mi
