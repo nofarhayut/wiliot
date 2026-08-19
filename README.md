@@ -1,5 +1,9 @@
 # Wiliot DevOps Assignment
 
+> 📊 **[View the visual overview →](https://claude.ai/code/artifact/29d1c357-e968-43d0-9e68-298841ba8b43)** — a one-page presentation of this project.
+>
+> 📄 Per-task deep-dives: **[Task 1 — Infrastructure](TASK1.md)** · **[Task 2 — Data pipeline](TASK2.md)**
+
 Two parts:
 
 1. **Task 1** — build the AWS infrastructure with Terraform (VPC, EKS, ECR, RDS, IAM).
