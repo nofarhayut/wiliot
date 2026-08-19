@@ -1,0 +1,42 @@
+openapi: 3.0.3
+info:
+  # Service name + version define the mock URL: /rest/Orders/1.0.0/orders
+  title: Orders
+  version: 1.0.0
+  description: >
+    Dummy orders generator for the Wiliot demo, served by Microcks.
+    Each element below uses Microcks templating ({{ ... }}) which is
+    evaluated *per request*, so every call returns freshly randomized data.
+paths:
+  /orders:
+    get:
+      operationId: getOrders
+      summary: Return a batch of ~20 randomly generated orders
+      responses:
+        '200':
+          description: A batch of dummy orders
+          content:
+            application/json:
+              examples:
+                dummy_orders:
+                  value:
+                    - { order_id: "{{ uuid() }}", customer: "{{ randomFullName() }}", email: "{{ randomEmail() }}", amount: "{{ randomInt(10, 5000) }}", created_at: "{{ now(yyyy-MM-dd'T'HH:mm:ss'Z') }}" }
+                    - { order_id: "{{ uuid() }}", customer: "{{ randomFullName() }}", email: "{{ randomEmail() }}", amount: "{{ randomInt(10, 5000) }}", created_at: "{{ now(yyyy-MM-dd'T'HH:mm:ss'Z') }}" }
+                    - { order_id: "{{ uuid() }}", customer: "{{ randomFullName() }}", email: "{{ randomEmail() }}", amount: "{{ randomInt(10, 5000) }}", created_at: "{{ now(yyyy-MM-dd'T'HH:mm:ss'Z') }}" }
+                    - { order_id: "{{ uuid() }}", customer: "{{ randomFullName() }}", email: "{{ randomEmail() }}", amount: "{{ randomInt(10, 5000) }}", created_at: "{{ now(yyyy-MM-dd'T'HH:mm:ss'Z') }}" }
+                    - { order_id: "{{ uuid() }}", customer: "{{ randomFullName() }}", email: "{{ randomEmail() }}", amount: "{{ randomInt(10, 5000) }}", created_at: "{{ now(yyyy-MM-dd'T'HH:mm:ss'Z') }}" }
+                    - { order_id: "{{ uuid() }}", customer: "{{ randomFullName() }}", email: "{{ randomEmail() }}", amount: "{{ randomInt(10, 5000) }}", created_at: "{{ now(yyyy-MM-dd'T'HH:mm:ss'Z') }}" }
+                    - { order_id: "{{ uuid() }}", customer: "{{ randomFullName() }}", email: "{{ randomEmail() }}", amount: "{{ randomInt(10, 5000) }}", created_at: "{{ now(yyyy-MM-dd'T'HH:mm:ss'Z') }}" }
+                    - { order_id: "{{ uuid() }}", customer: "{{ randomFullName() }}", email: "{{ randomEmail() }}", amount: "{{ randomInt(10, 5000) }}", created_at: "{{ now(yyyy-MM-dd'T'HH:mm:ss'Z') }}" }
+                    - { order_id: "{{ uuid() }}", customer: "{{ randomFullName() }}", email: "{{ randomEmail() }}", amount: "{{ randomInt(10, 5000) }}", created_at: "{{ now(yyyy-MM-dd'T'HH:mm:ss'Z') }}" }
+                    - { order_id: "{{ uuid() }}", customer: "{{ randomFullName() }}", email: "{{ randomEmail() }}", amount: "{{ randomInt(10, 5000) }}", created_at: "{{ now(yyyy-MM-dd'T'HH:mm:ss'Z') }}" }
+                    - { order_id: "{{ uuid() }}", customer: "{{ randomFullName() }}", email: "{{ randomEmail() }}", amount: "{{ randomInt(10, 5000) }}", created_at: "{{ now(yyyy-MM-dd'T'HH:mm:ss'Z') }}" }
+                    - { order_id: "{{ uuid() }}", customer: "{{ randomFullName() }}", email: "{{ randomEmail() }}", amount: "{{ randomInt(10, 5000) }}", created_at: "{{ now(yyyy-MM-dd'T'HH:mm:ss'Z') }}" }
+                    - { order_id: "{{ uuid() }}", customer: "{{ randomFullName() }}", email: "{{ randomEmail() }}", amount: "{{ randomInt(10, 5000) }}", created_at: "{{ now(yyyy-MM-dd'T'HH:mm:ss'Z') }}" }
+                    - { order_id: "{{ uuid() }}", customer: "{{ randomFullName() }}", email: "{{ randomEmail() }}", amount: "{{ randomInt(10, 5000) }}", created_at: "{{ now(yyyy-MM-dd'T'HH:mm:ss'Z') }}" }
+                    - { order_id: "{{ uuid() }}", customer: "{{ randomFullName() }}", email: "{{ randomEmail() }}", amount: "{{ randomInt(10, 5000) }}", created_at: "{{ now(yyyy-MM-dd'T'HH:mm:ss'Z') }}" }
+                    - { order_id: "{{ uuid() }}", customer: "{{ randomFullName() }}", email: "{{ randomEmail() }}", amount: "{{ randomInt(10, 5000) }}", created_at: "{{ now(yyyy-MM-dd'T'HH:mm:ss'Z') }}" }
+                    - { order_id: "{{ uuid() }}", customer: "{{ randomFullName() }}", email: "{{ randomEmail() }}", amount: "{{ randomInt(10, 5000) }}", created_at: "{{ now(yyyy-MM-dd'T'HH:mm:ss'Z') }}" }
+                    - { order_id: "{{ uuid() }}", customer: "{{ randomFullName() }}", email: "{{ randomEmail() }}", amount: "{{ randomInt(10, 5000) }}", created_at: "{{ now(yyyy-MM-dd'T'HH:mm:ss'Z') }}" }
+                    - { order_id: "{{ uuid() }}", customer: "{{ randomFullName() }}", email: "{{ randomEmail() }}", amount: "{{ randomInt(10, 5000) }}", created_at: "{{ now(yyyy-MM-dd'T'HH:mm:ss'Z') }}" }
+                    - { order_id: "{{ uuid() }}", customer: "{{ randomFullName() }}", email: "{{ randomEmail() }}", amount: "{{ randomInt(10, 5000) }}", created_at: "{{ now(yyyy-MM-dd'T'HH:mm:ss'Z') }}" }

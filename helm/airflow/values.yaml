@@ -1,0 +1,68 @@
+# apache-airflow Helm chart values — Wiliot assignment
+# Install manually (see helm/README.md), NOT via Terraform.
+
+executor: KubernetesExecutor # task pods on demand; no Celery/Redis
+
+# Optional but recommended: set a stable key so pods don't restart on every upgrade.
+# Generate one: python3 -c "import secrets; print(secrets.token_hex(16))"
+# webserverSecretKey: <32-char-hex>
+
+# Bundled metadata Postgres with persistence OFF -> no PVC, no EBS CSI driver needed.
+postgresql:
+  enabled: true
+  primary:
+    persistence:
+      enabled: false
+
+# Components not needed with KubernetesExecutor / for this assignment.
+redis:
+  enabled: false
+flower:
+  enabled: false
+statsd:
+  enabled: false
+pgbouncer:
+  enabled: false
+triggerer:
+  enabled: false
+
+# No persistent volumes anywhere (logs/dags use emptyDir).
+logs:
+  persistence:
+    enabled: false
+dags:
+  persistence:
+    enabled: false
+
+# Inject the RDS connection secret into every Airflow pod.
+# DAGs then reference it by conn_id "rds_postgres". Create the secret first (see README).
+extraEnvFrom: |
+  - secretRef:
+      name: rds-connection
+
+# DAG delivery (demo shortcut): mount DAGs from a ConfigMap built out of ./dags.
+# No git-sync, no EBS-backed PVC, no custom image — just kubectl the folder in.
+# Refresh with: make dags   (see Makefile / README)
+# NOTE: this chart applies these to ALL airflow pods via top-level volumes/volumeMounts.
+volumes:
+  - name: airflow-dags
+    configMap:
+      name: airflow-dags
+      optional: true # so pods still start if the ConfigMap isn't created yet
+volumeMounts:
+  # subPath mounts the single file (not the whole ConfigMap dir) so Airflow's DAG
+  # walker doesn't trip over the ConfigMap's ..data symlinks ("recursive loop").
+  # Trade-off: subPath doesn't hot-reload — restart the pods after `make dags`.
+  - name: airflow-dags
+    mountPath: /opt/airflow/dags/ingestion_dag.py
+    subPath: ingestion_dag.py
+    readOnly: true
+
+# Expose the web UI externally via an AWS NLB (satisfies the "Load Balancer" requirement).
+# Airflow 3.x serves the UI from the "api-server" component (renamed from "webserver").
+apiServer:
+  service:
+    type: LoadBalancer
+    annotations:
+      service.beta.kubernetes.io/aws-load-balancer-type: nlb
+      service.beta.kubernetes.io/aws-load-balancer-scheme: internet-facing

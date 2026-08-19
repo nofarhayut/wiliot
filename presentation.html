@@ -1,0 +1,507 @@
+<style>
+  :root {
+    /* type */
+    --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    --font-mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+
+    /* light = blueprint-on-paper (default) */
+    --bg:       #EDF1F6;
+    --bg-grid:  #d7dfea;
+    --panel:    #ffffff;
+    --panel-2:  #f5f8fc;
+    --border:   #dbe3ee;
+    --border-2: #c6d2e2;
+    --text:     #10192a;
+    --muted:    #56657c;
+    --faint:    #8493a8;
+    --accent:   #2563eb;
+    --accent-2: #0d9488;
+    --success:  #0f9d68;
+    --success-bg:#e2f5ec;
+    --warn:     #b5730c;
+    --warn-bg:  #f8efdc;
+    --shadow:   0 1px 2px rgba(16,25,42,.06), 0 8px 24px rgba(16,25,42,.06);
+    --glow: transparent;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg:       #090d14;
+      --bg-grid:  #121a26;
+      --panel:    #0f1620;
+      --panel-2:  #131c28;
+      --border:   #1f2b3a;
+      --border-2: #29384b;
+      --text:     #e7eef7;
+      --muted:    #8394ab;
+      --faint:    #5f7189;
+      --accent:   #5b9bff;
+      --accent-2: #3fd8ce;
+      --success:  #35d39a;
+      --success-bg:#0f2a22;
+      --warn:     #f2b457;
+      --warn-bg:  #2a2213;
+      --shadow:   0 1px 0 rgba(255,255,255,.03), 0 16px 40px rgba(0,0,0,.5);
+      --glow: 0 0 0 1px rgba(91,155,255,.08), 0 0 40px rgba(63,216,206,.06);
+    }
+  }
+  /* explicit toggle wins in both directions */
+  :root[data-theme="light"] {
+    --bg:#EDF1F6; --bg-grid:#d7dfea; --panel:#fff; --panel-2:#f5f8fc; --border:#dbe3ee; --border-2:#c6d2e2;
+    --text:#10192a; --muted:#56657c; --faint:#8493a8; --accent:#2563eb; --accent-2:#0d9488;
+    --success:#0f9d68; --success-bg:#e2f5ec; --warn:#b5730c; --warn-bg:#f8efdc;
+    --shadow:0 1px 2px rgba(16,25,42,.06),0 8px 24px rgba(16,25,42,.06); --glow:transparent;
+  }
+  :root[data-theme="dark"] {
+    --bg:#090d14; --bg-grid:#121a26; --panel:#0f1620; --panel-2:#131c28; --border:#1f2b3a; --border-2:#29384b;
+    --text:#e7eef7; --muted:#8394ab; --faint:#5f7189; --accent:#5b9bff; --accent-2:#3fd8ce;
+    --success:#35d39a; --success-bg:#0f2a22; --warn:#f2b457; --warn-bg:#2a2213;
+    --shadow:0 1px 0 rgba(255,255,255,.03),0 16px 40px rgba(0,0,0,.5); --glow:0 0 0 1px rgba(91,155,255,.08),0 0 40px rgba(63,216,206,.06);
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background:
+      linear-gradient(var(--bg-grid) 1px, transparent 1px) 0 0 / 100% 28px,
+      linear-gradient(90deg, var(--bg-grid) 1px, transparent 1px) 0 0 / 28px 100%,
+      var(--bg);
+    background-attachment: fixed;
+    color: var(--text);
+    font-family: var(--font-sans);
+    font-size: 15px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
+
+  /* mono utility labels — the character face */
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    display: inline-flex; align-items: center; gap: 8px;
+  }
+  .eyebrow::before { content: ""; width: 22px; height: 1px; background: var(--accent); opacity:.7; }
+
+  h1, h2, h3 { text-wrap: balance; line-height: 1.12; margin: 0; letter-spacing: -0.02em; }
+  h1 { font-size: clamp(2.1rem, 5vw, 3.3rem); font-weight: 680; }
+  h2 { font-size: clamp(1.5rem, 3vw, 2rem); font-weight: 660; }
+  h3 { font-size: 1.02rem; font-weight: 640; letter-spacing: -0.01em; }
+  p { margin: 0; color: var(--muted); }
+  .lead { font-size: clamp(1.05rem, 1.6vw, 1.22rem); color: var(--muted); max-width: 62ch; }
+  code, .mono { font-family: var(--font-mono); }
+  .tnum { font-variant-numeric: tabular-nums; }
+
+  /* top bar */
+  .topbar {
+    position: sticky; top: 0; z-index: 50;
+    backdrop-filter: blur(10px);
+    background: color-mix(in srgb, var(--bg) 78%, transparent);
+    border-bottom: 1px solid var(--border);
+  }
+  .topbar .row { display: flex; align-items: center; justify-content: space-between; height: 56px; }
+  .brand { display: flex; align-items: center; gap: 11px; font-family: var(--font-mono); font-size: 13px; letter-spacing: .04em; }
+  .brand b { font-weight: 680; letter-spacing:.02em; }
+  .brand .sep { color: var(--faint); }
+  .brand .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--success); box-shadow: 0 0 0 3px color-mix(in srgb, var(--success) 22%, transparent); }
+  .topbar .right { display: flex; align-items: center; gap: 14px; }
+  .status-pill {
+    font-family: var(--font-mono); font-size: 11.5px; letter-spacing:.06em;
+    color: var(--success); background: var(--success-bg);
+    border: 1px solid color-mix(in srgb, var(--success) 30%, transparent);
+    padding: 4px 10px; border-radius: 999px; display:inline-flex; gap:6px; align-items:center;
+  }
+  .themebtn {
+    appearance: none; cursor: pointer; width: 34px; height: 34px; border-radius: 9px;
+    border: 1px solid var(--border-2); background: var(--panel); color: var(--muted);
+    display: grid; place-items: center;
+  }
+  .themebtn:hover { color: var(--text); border-color: var(--accent); }
+  .themebtn svg { width: 17px; height: 17px; }
+  :root[data-theme="dark"] .themebtn .sun, :root:not([data-theme]) .themebtn .sun { display: none; }
+  :root[data-theme="light"] .themebtn .moon { display: none; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme]) .themebtn .sun { display:block; } :root:not([data-theme]) .themebtn .moon { display:none; } }
+
+  /* hero */
+  .hero { padding: 74px 0 20px; }
+  .hero h1 { margin-top: 18px; max-width: 17ch; }
+  .hero .lead { margin-top: 20px; }
+  .meta-line { margin-top: 22px; font-family: var(--font-mono); font-size: 12.5px; color: var(--faint); display:flex; flex-wrap:wrap; gap: 8px 18px; }
+  .meta-line span { display:inline-flex; gap:7px; }
+  .meta-line b { color: var(--muted); font-weight: 600; }
+
+  /* metrics */
+  .metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin: 40px 0 8px; }
+  .metric { background: var(--panel); border: 1px solid var(--border); border-radius: 14px; padding: 18px 18px 16px; box-shadow: var(--shadow); }
+  .metric .n { font-size: 2rem; font-weight: 680; letter-spacing: -0.03em; }
+  .metric .n .u { font-size: 1rem; color: var(--muted); font-weight: 600; margin-left: 2px; }
+  .metric .l { font-family: var(--font-mono); font-size: 11.5px; letter-spacing: .05em; text-transform: uppercase; color: var(--faint); margin-top: 4px; }
+
+  /* pipeline diagram */
+  .pipe { margin: 30px 0 8px; background: var(--panel); border: 1px solid var(--border); border-radius: 18px; padding: 26px 22px 22px; box-shadow: var(--shadow), var(--glow); position: relative; overflow: hidden; }
+  .pipe .cap { display:flex; align-items:center; justify-content:space-between; margin-bottom: 20px; gap: 12px; flex-wrap: wrap; }
+  .pipe .cap .t { font-family: var(--font-mono); font-size: 12px; letter-spacing:.06em; color: var(--muted); }
+  .pipe .cap .clock { color: var(--accent-2); }
+  .flow { display: grid; grid-template-columns: 1fr auto 1fr auto 1fr auto 1fr; align-items: center; gap: 4px; }
+  .node { text-align: center; padding: 6px 4px; }
+  .node .ico { width: 46px; height: 46px; margin: 0 auto 10px; border-radius: 12px; display: grid; place-items: center;
+    background: var(--panel-2); border: 1px solid var(--border-2); color: var(--accent); }
+  .node.n-rds .ico { color: var(--accent-2); }
+  .node .ico svg { width: 23px; height: 23px; }
+  .node .nm { font-weight: 620; font-size: .95rem; }
+  .node .sub { font-family: var(--font-mono); font-size: 11px; color: var(--faint); margin-top: 3px; }
+  .seg { position: relative; height: 2px; min-width: 34px; background: var(--border-2); border-radius: 2px; align-self: center; margin-top: -20px; }
+  .seg .lbl { position:absolute; top: -20px; left: 50%; transform: translateX(-50%); font-family: var(--font-mono); font-size: 10px; letter-spacing:.08em; text-transform: uppercase; color: var(--faint); white-space: nowrap; }
+  .seg .dot { position:absolute; top: 50%; left: 0; width: 7px; height: 7px; border-radius: 50%; margin-top: -3.5px; background: var(--accent-2);
+    box-shadow: 0 0 8px 1px color-mix(in srgb, var(--accent-2) 70%, transparent); animation: flow 2.2s linear infinite; }
+  .seg.s2 .dot { animation-delay: .5s; } .seg.s3 .dot { animation-delay: 1s; }
+  @keyframes flow { 0%{ left:2%; opacity:0 } 12%{opacity:1} 88%{opacity:1} 100%{ left:98%; opacity:0 } }
+
+  /* sections */
+  section { padding: 64px 0; border-top: 1px solid var(--border); }
+  .sec-head { max-width: 62ch; margin-bottom: 34px; }
+  .sec-head h2 { margin-top: 14px; }
+  .sec-head p { margin-top: 12px; }
+
+  /* resource cards */
+  .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  .card { background: var(--panel); border: 1px solid var(--border); border-radius: 14px; padding: 18px; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 9px; }
+  .card .top { display:flex; align-items:center; gap: 11px; }
+  .card .badge { width: 34px; height: 34px; border-radius: 9px; display:grid; place-items:center; background: var(--panel-2); border: 1px solid var(--border-2); color: var(--accent); flex: none; }
+  .card .badge svg { width: 18px; height: 18px; }
+  .card h3 { font-size: .98rem; }
+  .card .mod { font-family: var(--font-mono); font-size: 11px; color: var(--faint); }
+  .card p { font-size: .875rem; line-height: 1.5; }
+
+  /* considerations */
+  .considerations { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 30px; margin-top: 8px; }
+  .con { display: flex; gap: 13px; padding: 4px 0; }
+  .con .k { flex: none; width: 26px; height: 26px; border-radius: 7px; display: grid; place-items: center; background: var(--panel-2); border: 1px solid var(--border-2); color: var(--accent); margin-top: 2px; }
+  .con .k svg { width: 15px; height: 15px; }
+  .con h3 { font-size: .92rem; margin-bottom: 2px; }
+  .con p { font-size: .855rem; line-height: 1.5; }
+
+  .dep { margin-top: 30px; background: var(--panel-2); border: 1px dashed var(--border-2); border-radius: 12px; padding: 16px 18px;
+    font-family: var(--font-mono); font-size: 12.5px; color: var(--muted); overflow-x: auto; }
+  .dep b { color: var(--accent); font-weight: 600; }
+
+  /* task 2 component list */
+  .comp { display: grid; grid-template-columns: 1fr; gap: 10px; }
+  .comprow { display: grid; grid-template-columns: 190px 1fr; gap: 20px; align-items: start; background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; box-shadow: var(--shadow); }
+  .comprow .who { display:flex; flex-direction: column; gap: 5px; }
+  .comprow .who .nm { font-weight: 640; display:flex; align-items:center; gap: 9px; }
+  .comprow .who .nm svg { width: 17px; height: 17px; color: var(--accent); flex:none; }
+  .comprow.rds .who .nm svg { color: var(--accent-2); }
+  .comprow .who .where { font-family: var(--font-mono); font-size: 11px; color: var(--faint); }
+  .comprow p { font-size: .88rem; line-height: 1.55; }
+
+  /* proof panel */
+  .proof { margin-top: 34px; background: var(--panel); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; box-shadow: var(--shadow); }
+  .proof .ph { display: flex; align-items: center; gap: 10px; padding: 13px 18px; border-bottom: 1px solid var(--border); background: var(--panel-2); }
+  .proof .ph .t { font-family: var(--font-mono); font-size: 12px; letter-spacing:.05em; color: var(--muted); }
+  .proof .ph .dots { display:flex; gap:6px; margin-right: 4px; }
+  .proof .ph .dots i { width: 10px; height: 10px; border-radius: 50%; background: var(--border-2); }
+  .proof .body { padding: 20px 18px; display: grid; grid-template-columns: 1.1fr 1fr; gap: 20px; }
+  .steps { display:flex; flex-direction: column; gap: 10px; }
+  .step { display:flex; align-items:center; gap: 12px; font-family: var(--font-mono); font-size: 13px; }
+  .step .chk { width: 22px; height: 22px; border-radius: 50%; background: var(--success-bg); color: var(--success); display:grid; place-items:center; flex:none; border: 1px solid color-mix(in srgb, var(--success) 30%, transparent); }
+  .step .chk svg { width: 13px; height: 13px; }
+  .step .nm2 { font-weight: 600; color: var(--text); }
+  .step .st { margin-left: auto; color: var(--success); font-size: 11.5px; letter-spacing:.05em; }
+  .result { background: var(--panel-2); border: 1px solid var(--border-2); border-radius: 12px; padding: 15px 16px; font-family: var(--font-mono); font-size: 12.5px; color: var(--muted); }
+  .result .big { font-size: 1.9rem; color: var(--success); font-weight: 680; letter-spacing:-.02em; line-height:1; }
+  .result .lab { font-size: 11px; letter-spacing:.06em; text-transform: uppercase; color: var(--faint); margin-top: 4px; }
+  .result .sample { margin-top: 14px; padding-top: 13px; border-top: 1px solid var(--border); color: var(--text); word-break: break-all; }
+  .result .sample .c { color: var(--accent-2); }
+
+  /* terminal */
+  .term { background: #0a0f18; border: 1px solid #1e2b3d; border-radius: 14px; overflow: hidden; box-shadow: var(--shadow); }
+  .term .bar { display:flex; align-items:center; gap: 8px; padding: 11px 15px; border-bottom: 1px solid #1a2636; background: #0d1420; }
+  .term .bar i { width: 11px; height: 11px; border-radius: 50%; }
+  .term .bar i:nth-child(1){ background:#ff5f57 } .term .bar i:nth-child(2){ background:#febc2e } .term .bar i:nth-child(3){ background:#28c840 }
+  .term .bar .ttl { margin-left: 8px; font-family: var(--font-mono); font-size: 11.5px; color: #6b7d95; }
+  .term pre { margin: 0; padding: 18px 18px; overflow-x: auto; font-family: var(--font-mono); font-size: 12.5px; line-height: 1.85; color: #cdd9e8; }
+  .term .cmt { color: #5b7089; }
+  .term .p { color: #3fd8ce; } /* prompt */
+  .term .fl { color: #f2b457; } /* flag / arg */
+  .term .ok { color: #35d39a; }
+
+  /* stack chips */
+  .chips { display:flex; flex-wrap: wrap; gap: 9px; margin-top: 8px; }
+  .chip { font-family: var(--font-mono); font-size: 12px; color: var(--muted); background: var(--panel); border: 1px solid var(--border); border-radius: 999px; padding: 6px 13px; }
+  .chip b { color: var(--text); font-weight: 600; }
+
+  footer { border-top: 1px solid var(--border); padding: 30px 0 60px; }
+  footer .row { display:flex; justify-content: space-between; align-items:center; gap: 16px; flex-wrap: wrap; font-family: var(--font-mono); font-size: 12px; color: var(--faint); }
+
+  /* reveal */
+  .js .reveal { opacity: 0; transform: translateY(14px); transition: opacity .6s cubic-bezier(.2,.7,.2,1), transform .6s cubic-bezier(.2,.7,.2,1); }
+  .js .reveal.in { opacity: 1; transform: none; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
+
+  @media (max-width: 860px) {
+    .metrics { grid-template-columns: repeat(2, 1fr); }
+    .cards { grid-template-columns: 1fr 1fr; }
+    .considerations { grid-template-columns: 1fr; }
+    .proof .body { grid-template-columns: 1fr; }
+    .flow { grid-template-columns: 1fr; gap: 0; }
+    .seg { width: 2px; height: 30px; min-width: 0; margin: 4px auto; justify-self: center; }
+    .seg .lbl { top: 50%; left: 16px; transform: translateY(-50%); }
+    .seg .dot { left: 50%; top: 0; margin-left: -3.5px; margin-top: 0; animation: flowv 2.2s linear infinite; }
+    @keyframes flowv { 0%{top:2%;opacity:0} 12%{opacity:1} 88%{opacity:1} 100%{top:92%;opacity:0} }
+  }
+  @media (max-width: 560px) {
+    .cards { grid-template-columns: 1fr; }
+    .comprow { grid-template-columns: 1fr; gap: 8px; }
+    .metrics { grid-template-columns: 1fr 1fr; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .seg .dot { animation: none; opacity: .9; left: 50%; }
+    html { scroll-behavior: auto; }
+    .js .reveal { transition: none; }
+  }
+</style>
+
+<div class="topbar">
+  <div class="wrap row">
+    <div class="brand">
+      <span class="dot" aria-hidden="true"></span>
+      <b>WILIOT</b><span class="sep">/</span><span>DevOps Assignment</span>
+    </div>
+    <div class="right">
+      <span class="status-pill">● all tasks green</span>
+      <button class="themebtn" id="themeBtn" aria-label="Toggle light and dark theme">
+        <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<header class="hero">
+  <div class="wrap">
+    <span class="eyebrow">DevOps Home Assignment</span>
+    <h1>Cloud infrastructure and an ingestion pipeline, built end to end.</h1>
+    <p class="lead">Terraform stands up the AWS foundation — network, an EKS cluster, a private Postgres database, image registries and IAM. On top of it, an Airflow job pulls dummy data from a mock API every 15 minutes, cleans it, and lands it in the database.</p>
+    <div class="meta-line">
+      <span><b>Account</b> 092988563851</span>
+      <span><b>Region</b> us-east-1</span>
+      <span><b>Cluster</b> wiliot-dev · k8s 1.31</span>
+      <span><b>Provisioned by</b> Terraform + Helm</span>
+    </div>
+
+    <div class="metrics reveal">
+      <div class="metric"><div class="n tnum">5</div><div class="l">Terraform modules</div></div>
+      <div class="metric"><div class="n tnum">33</div><div class="l">AWS resources</div></div>
+      <div class="metric"><div class="n tnum">3<span class="u">-step</span></div><div class="l">ETL DAG</div></div>
+      <div class="metric"><div class="n tnum">40</div><div class="l">rows loaded to RDS</div></div>
+    </div>
+
+    <div class="pipe reveal">
+      <div class="cap">
+        <span class="t">Task 2 &mdash; data flow</span>
+        <span class="t clock">⏱ scheduler runs it every 15 min</span>
+      </div>
+      <div class="flow">
+        <div class="node n-af">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div>
+          <div class="nm">Airflow</div><div class="sub">orchestrator</div>
+        </div>
+        <div class="seg s1"><span class="lbl">extract</span><span class="dot"></span></div>
+        <div class="node n-mc">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h16M4 12h16M4 17h10"/><circle cx="18.5" cy="17" r="2.2"/></svg></div>
+          <div class="nm">Microcks</div><div class="sub">mock API</div>
+        </div>
+        <div class="seg s2"><span class="lbl">transform</span><span class="dot"></span></div>
+        <div class="node n-tf">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M8 6l-4 6 4 6M16 6l4 6-4 6"/></svg></div>
+          <div class="nm">Transform</div><div class="sub">python</div>
+        </div>
+        <div class="seg s3"><span class="lbl">load</span><span class="dot"></span></div>
+        <div class="node n-rds">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><ellipse cx="12" cy="6" rx="7" ry="3"/><path d="M5 6v12c0 1.7 3.1 3 7 3s7-1.3 7-3V6"/><path d="M5 12c0 1.7 3.1 3 7 3s7-1.3 7-3"/></svg></div>
+          <div class="nm">RDS Postgres</div><div class="sub">orders table</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<section id="task1">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="eyebrow">Task 01 / Infrastructure</span>
+      <h2>The AWS foundation, as Terraform modules</h2>
+      <p>Each resource is its own reusable module, composed together in one <code>environments/dev</code> root with remote state in S3. Nothing is clicked in the console.</p>
+    </div>
+
+    <div class="cards reveal">
+      <div class="card">
+        <div class="top"><div class="badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg></div><div><h3>VPC</h3><div class="mod">modules/network</div></div></div>
+        <p>Network with 2 public + 2 private subnets across two AZs, an internet gateway, one NAT gateway and route tables.</p>
+      </div>
+      <div class="card">
+        <div class="top"><div class="badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 2l8 4.5v9L12 20l-8-4.5v-9L12 2z"/><path d="M12 6.5v7M8 8.7v6.6M16 8.7v6.6"/></svg></div><div><h3>EKS</h3><div class="mod">modules/eks</div></div></div>
+        <p>Managed Kubernetes cluster on 1.31 with a node group of two <code>t3.medium</code> workers.</p>
+      </div>
+      <div class="card">
+        <div class="top"><div class="badge" style="color:var(--accent-2)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><ellipse cx="12" cy="6" rx="7" ry="3"/><path d="M5 6v12c0 1.7 3.1 3 7 3s7-1.3 7-3V6"/><path d="M5 12c0 1.7 3.1 3 7 3s7-1.3 7-3"/></svg></div><div><h3>RDS Postgres</h3><div class="mod">modules/rds</div></div></div>
+        <p>Private PostgreSQL, its own subnet group and security group, and a generated password.</p>
+      </div>
+      <div class="card">
+        <div class="top"><div class="badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M7 8h6M7 12h10M7 16h8"/></svg></div><div><h3>ECR</h3><div class="mod">modules/ecr</div></div></div>
+        <p>Container image repositories with a lifecycle policy to keep only recent images.</p>
+      </div>
+      <div class="card">
+        <div class="top"><div class="badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6l7-3z"/><path d="M9.5 12l1.7 1.7L15 10"/></svg></div><div><h3>IAM</h3><div class="mod">modules/iam</div></div></div>
+        <p>The roles EKS needs — one for the control plane, one for the worker nodes.</p>
+      </div>
+      <div class="card" style="justify-content:center; background:var(--panel-2); border-style:dashed;">
+        <p style="font-family:var(--font-mono); font-size:.8rem; color:var(--muted); line-height:1.6;">All five wired together in<br><b style="color:var(--text)">environments/dev/</b><br>with a single <b style="color:var(--accent)">team = devops</b> tag on every resource.</p>
+      </div>
+    </div>
+
+    <div class="dep reveal">network <b>&rarr;</b> eks <b>&rarr;</b> rds &nbsp;&nbsp;&nbsp; iam <b>&rarr;</b> eks &nbsp;&nbsp;&nbsp; ecr (standalone) &nbsp;&nbsp;&nbsp;<span style="color:var(--faint)"># apply order follows the arrows</span></div>
+
+    <div style="margin-top:44px" class="reveal">
+      <span class="eyebrow" style="color:var(--muted)">Considerations</span>
+      <div class="considerations" style="margin-top:18px">
+        <div class="con"><div class="k"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></div><div><h3>One module per resource</h3><p>Reusable and easy to read. Dependency order is network / iam / ecr, then eks, then rds.</p></div></div>
+        <div class="con"><div class="k"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></div><div><h3>Security groups sit with what they protect</h3><p>RDS only accepts port 5432 from the EKS security group, so the database is reachable only from inside the cluster.</p></div></div>
+        <div class="con"><div class="k"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l8 4.5v9L12 21l-8-4.5v-9z"/></svg></div><div><h3>The database is private</h3><p>No public access and encrypted at rest — nothing about it faces the internet.</p></div></div>
+        <div class="con"><div class="k"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/></svg></div><div><h3>No passwords in the code</h3><p>The DB password is generated by Terraform and only lives in encrypted state. Read on demand, never committed.</p></div></div>
+        <div class="con"><div class="k"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7c0-1.7 3.6-3 8-3s8 1.3 8 3-3.6 3-8 3-8-1.3-8-3z"/><path d="M4 7v10c0 1.7 3.6 3 8 3s8-1.3 8-3V7"/></svg></div><div><h3>Remote, locked state</h3><p>Terraform state lives in an S3 bucket with locking, so applies are safe and shareable.</p></div></div>
+        <div class="con"><div class="k"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h4l3 8 4-16 3 8h4"/></svg></div><div><h3>Cheap by default, ready to scale</h3><p>One NAT, a small DB, two small nodes — fine for a demo. The network is split from the cluster, so a second cluster can share the VPC later.</p></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="task2">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="eyebrow">Task 02 / Data pipeline</span>
+      <h2>Fake data in, clean rows out — every 15 minutes</h2>
+      <p>Airflow asks Microcks for a batch of fake orders, cleans them in plain Python, and writes them into the RDS <code>orders</code> table. The whole thing is deployed with Helm, one command away.</p>
+    </div>
+
+    <div class="comp reveal">
+      <div class="comprow">
+        <div class="who"><span class="nm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h16M4 12h16M4 17h10"/><circle cx="18.5" cy="17" r="2.2"/></svg>Microcks</span><span class="where">microcks namespace</span></div>
+        <p>A fake API, installed from its official Helm chart. Serves <code>GET /orders</code> and returns ~20 random orders each call. Auth off and a throwaway database — demo settings, noted as such.</p>
+      </div>
+      <div class="comprow">
+        <div class="who"><span class="nm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Airflow</span><span class="where">airflow namespace</span></div>
+        <p>The orchestrator. Its scheduler runs the job on a timer, the dag-processor reads the DAG file, and the web UI is exposed to the internet through a load balancer.</p>
+      </div>
+      <div class="comprow">
+        <div class="who"><span class="nm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M8 6l-4 6 4 6M16 6l4 6-4 6"/></svg>The DAG</span><span class="where">dags/ingestion_dag.py</span></div>
+        <p>The actual job in three steps — <b style="color:var(--text)">extract</b> (call the mock), <b style="color:var(--text)">transform</b> (clean it), <b style="color:var(--text)">load</b> (write to RDS). Safe to re-run: it never creates duplicates.</p>
+      </div>
+      <div class="comprow rds">
+        <div class="who"><span class="nm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><ellipse cx="12" cy="6" rx="7" ry="3"/><path d="M5 6v12c0 1.7 3.1 3 7 3s7-1.3 7-3V6"/></svg>RDS connection</span><span class="where">kubernetes secret</span></div>
+        <p>The database connection string is handed to Airflow as a secret, so the DAG uses it by name (<code>rds_postgres</code>) and no password ever sits in the code.</p>
+      </div>
+    </div>
+
+    <div class="proof reveal">
+      <div class="ph"><span class="dots"><i></i><i></i><i></i></span><span class="t">orders_ingestion &mdash; last run</span></div>
+      <div class="body">
+        <div class="steps">
+          <div class="step"><span class="chk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12l4 4L19 7"/></svg></span><span class="nm2">extract</span><span class="st">SUCCESS</span></div>
+          <div class="step"><span class="chk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12l4 4L19 7"/></svg></span><span class="nm2">transform</span><span class="st">SUCCESS</span></div>
+          <div class="step"><span class="chk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12l4 4L19 7"/></svg></span><span class="nm2">load</span><span class="st">SUCCESS</span></div>
+        </div>
+        <div class="result">
+          <div class="big tnum">40</div>
+          <div class="lab">rows in the orders table</div>
+          <div class="sample">sample row<br>(<span class="c">'a6386f26&hellip;'</span>, 'Denny Klein', 317)</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="run">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <span class="eyebrow">See it running</span>
+      <h2>A few commands to look at any part of it</h2>
+      <p>Standard <code>kubectl</code> — runnable from any machine with access to the cluster, not tied to a local setup. Point kubectl at the cluster once, then inspect the DAG, the pods, the logs, the mock, and the rows in the database.</p>
+    </div>
+    <div class="term reveal">
+      <div class="bar"><i></i><i></i><i></i><span class="ttl">kubectl — wiliot-dev</span></div>
+<pre><span class="cmt"># point kubectl at the cluster (any machine with AWS access)</span>
+<span class="p">$</span> aws eks update-kubeconfig <span class="fl">--name</span> wiliot-dev <span class="fl">--region</span> us-east-1
+
+<span class="cmt"># what's running</span>
+<span class="p">$</span> kubectl <span class="fl">-n</span> airflow get pods        <span class="cmt"># api-server, scheduler, dag-processor, db</span>
+<span class="p">$</span> kubectl <span class="fl">-n</span> microcks get pods       <span class="cmt"># microcks, mongodb</span>
+
+<span class="cmt"># the DAG: is it registered? any parse errors?</span>
+<span class="p">$</span> kubectl <span class="fl">-n</span> airflow exec deploy/airflow-scheduler <span class="fl">--</span> airflow dags list
+orders_ingestion   dags-folder   <span class="ok">✓ no import errors</span>
+
+<span class="cmt"># tail the logs of a component</span>
+<span class="p">$</span> kubectl <span class="fl">-n</span> airflow logs deploy/airflow-dag-processor <span class="fl">-c</span> dag-processor
+
+<span class="cmt"># open the Airflow UI locally  ->  http://localhost:8080 (admin/admin)</span>
+<span class="p">$</span> kubectl <span class="fl">-n</span> airflow port-forward svc/airflow-api-server 8080:8080
+
+<span class="cmt"># open Microcks and pull a batch of dummy orders</span>
+<span class="p">$</span> kubectl <span class="fl">-n</span> microcks port-forward svc/microcks 8585:8080
+<span class="p">$</span> curl <span class="fl">-s</span> http://localhost:8585/rest/Orders/1.0.0/orders | jq '.[0]'
+
+<span class="cmt"># the payoff: rows that landed in RDS</span>
+<span class="p">$</span> kubectl <span class="fl">-n</span> airflow exec deploy/airflow-scheduler <span class="fl">--</span> \
+    python <span class="fl">-c</span> "PostgresHook('rds_postgres').get_first('SELECT count(*) FROM orders')"
+<span class="ok">count = (40,)</span>
+</pre>
+    </div>
+
+    <div style="margin-top:40px" class="reveal">
+      <span class="eyebrow" style="color:var(--muted)">Built with</span>
+      <div class="chips" style="margin-top:16px">
+        <span class="chip"><b>Terraform</b></span>
+        <span class="chip"><b>AWS</b> VPC · EKS · RDS · ECR · IAM</span>
+        <span class="chip"><b>Kubernetes</b> 1.31</span>
+        <span class="chip"><b>Helm</b></span>
+        <span class="chip"><b>Apache Airflow</b> 3</span>
+        <span class="chip"><b>Microcks</b></span>
+        <span class="chip"><b>PostgreSQL</b></span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap row">
+    <span>Wiliot DevOps assignment · infrastructure &amp; ingestion pipeline</span>
+    <span>Terraform &rarr; EKS &rarr; Helm &rarr; Airflow &rarr; RDS</span>
+  </div>
+</footer>
+
+<script>
+  document.documentElement.classList.add('js');
+  // theme toggle — persists the presenter's choice
+  (function () {
+    var btn = document.getElementById('themeBtn');
+    btn.addEventListener('click', function () {
+      var cur = document.documentElement.getAttribute('data-theme');
+      var next = cur === 'dark' ? 'light' : (cur === 'light' ? 'dark' : (matchMedia('(prefers-color-scheme: dark)').matches ? 'light' : 'dark'));
+      document.documentElement.setAttribute('data-theme', next);
+    });
+  })();
+  // scroll reveal
+  (function () {
+    var els = document.querySelectorAll('.reveal');
+    if (!('IntersectionObserver' in window)) { els.forEach(function (e) { e.classList.add('in'); }); return; }
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) { if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); } });
+    }, { threshold: 0.12 });
+    els.forEach(function (e) { io.observe(e); });
+  })();
+</script>
