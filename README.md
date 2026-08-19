@@ -35,11 +35,6 @@ in `environments/dev/`.
 
 Deployed to AWS account `092988563851`, region `us-east-1`.
 
-```
-network ──► eks ──► rds        iam ──► eks
-   └──────► rds                ecr (on its own)
-```
-
 ## Considerations
 
 - **One module per resource.** Keeps things reusable and easy to read. `network`, `iam`

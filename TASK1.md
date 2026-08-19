@@ -18,17 +18,6 @@ Deployed to AWS account `092988563851`, region `us-east-1`.
 | **ECR** | [`modules/ecr`](modules/ecr) | Container image repositories + a lifecycle policy |
 | **IAM** | [`modules/iam`](modules/iam) | The roles EKS needs — control plane + worker nodes |
 
-## Dependency graph
-
-```
-network ──► eks ──► rds        iam ──► eks
-   └──────► rds                ecr (standalone)
-```
-
-- `network`, `iam`, `ecr` have no dependencies → apply first / in parallel.
-- `eks` consumes `network` (subnets) + `iam` (roles).
-- `rds` consumes `network` (subnets/VPC) + `eks` (its security group as the only allowed source on 5432).
-
 ## Considerations (the "why")
 
 - **One module per resource** — reusable and easy to read. Dependency order is
